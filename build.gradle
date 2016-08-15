@@ -27,7 +27,7 @@ buildscript {
         // in the individual module build.gradle files
     }
 }
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 
 dependencies {
     compile fileTree(include: '*.jar', dir: 'libs')
