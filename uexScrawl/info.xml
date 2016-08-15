@@ -20,7 +20,7 @@
 
 <uexplugins>
     <plugin
-        uexName="uexScrawl" version="3.0.0" build="0">
-        <info>0:涂鸦插件</info>
+        uexName="uexScrawl" version="4.0.0" build="1">
+        <info>1:涂鸦插件</info>
     </plugin>
 </uexplugins>
