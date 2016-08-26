@@ -34,6 +34,7 @@ import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -69,6 +70,7 @@ public class PhotoScrawlActivity extends FragmentActivity implements View.OnClic
     private RelativeLayout mBrushLayout;
     private BrushPreviewView mPreviewView;
     private int mScreenWidth;// 手机屏幕的宽（像素）
+    private int mScreenHeight;
     private int mCurrentAlpha = 255;
     private int mCurrentStroke = 15;
     private int mCurrnetColor=Color.RED;
@@ -88,7 +90,24 @@ public class PhotoScrawlActivity extends FragmentActivity implements View.OnClic
         initViews();
         Intent intent = getIntent();
         mPath = intent.getStringExtra(KEY_INTENT_IMAGE_PATH);
-        resizeBitmap();
+        ViewTreeObserver vto2 = mImageContentLayout.getViewTreeObserver();
+        vto2.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                if (Build.VERSION.SDK_INT<16) {
+                    mImageContentLayout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                }else{
+                    mImageContentLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                }
+                resizeBitmap();
+            }
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
     }
 
     private void initViews() {
@@ -113,7 +132,7 @@ public class PhotoScrawlActivity extends FragmentActivity implements View.OnClic
         DisplayMetrics metric = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metric);
         mScreenWidth = metric.widthPixels; // 屏幕宽度（像素）
-
+        mScreenHeight=metric.heightPixels;
         Bitmap bit = BitmapFactory.decodeFile(mPath);
 
         Bitmap resizeBmp = compressionFiller(bit, mImageContentLayout);
@@ -125,12 +144,12 @@ public class PhotoScrawlActivity extends FragmentActivity implements View.OnClic
 
     public Bitmap compressionFiller(Bitmap bitmap, View contentView)
     {
-        int layoutHeight = contentView.getHeight();
+
         float scale = 0f;
         int bitmapHeight = bitmap.getHeight();
         int bitmapWidth = bitmap.getWidth();
         scale = bitmapHeight > bitmapWidth
-                ? layoutHeight / (bitmapHeight * 1f)
+                ? contentView.getHeight() / (bitmapHeight * 1f)
                 : mScreenWidth / (bitmapWidth * 1f);
         Bitmap resizeBmp;
         if (scale != 0)
